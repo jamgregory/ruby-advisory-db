@@ -1,5 +1,6 @@
 require "active_support"
 require "active_support/core_ext/enumerable"
+require "action_view/helpers/text_helper"
 require "date"
 require "faraday"
 require "json"
@@ -236,6 +237,8 @@ module GitHub
 
     attr_reader :advisory, :vulnerabilities
 
+    include ActionView::Helpers::TextHelper
+
     def initialize(advisory)
       @advisory = advisory
       @vulnerabilities = []
@@ -307,7 +310,7 @@ module GitHub
         "ghsa" => ghsa_id[5..],
         "url" => external_reference,
         "title" => advisory["summary"],
-        "description" => advisory["description"],
+        "description" => word_wrap(advisory["description"], line_width: 80),
         "cvss_v3" => cvss,
       }.compact
     end
